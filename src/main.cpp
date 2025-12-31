@@ -3,8 +3,8 @@
 #include <ctime>
 #include <vector>
 
-const int SCREEN_WIDTH = 1920;
-const int SCREEN_HEIGHT = 1080;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
 const float FPS = 144.0f;
 const float PARTICLE_SPEED = 60.0f;
 
@@ -71,7 +71,7 @@ void InitFireworks(std::vector<Firework> &fws) {
   }
 }
 
-void DrawUpdateFireworks(std::vector<Firework> &fws) {
+void UpdateDrawFireworks(std::vector<Firework> &fws) {
   float deltaTime = GetFrameTime();
 
   for (size_t i = 0; i < fws.size(); i++) {
@@ -131,7 +131,7 @@ int main() {
   while (!WindowShouldClose()) {
     BeginDrawing();
     ClearBackground(BLACK);
-    DrawUpdateFireworks(fireworks);
+    UpdateDrawFireworks(fireworks);
     EndDrawing();
   }
 
