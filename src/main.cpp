@@ -3,16 +3,26 @@
 #include <ctime>
 #include <vector>
 
+
+#ifndef EMSCRIPTEN_BUILD
+const int SCREEN_WIDTH = 960;
+const int SCREEN_HEIGHT = 540;
+const int MAX_FIREWORKS = 10;
+const int MAX_SPARKS = 500;
+const float TIMESCALE = 1.0f;
+#else
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
+const int MAX_FIREWORKS = 20;
+const int MAX_SPARKS = 500;
+const float TIMESCALE = 0.66f;
+#endif
+
 const float FPS = 144.0f;
 const float PARTICLE_SPEED = 60.0f;
 
-const int MAX_FIREWORKS = 20;
-const int MAX_SPARKS = 500;
-
 const float CHANCE_OF_EXPLOSION = 0.05f;
-const int HEIGHT_THRESHOLD = 6 * SCREEN_HEIGHT / 10;
+const int HEIGHT_THRESHOLD = 4 * SCREEN_HEIGHT / 10;
 
 struct Spark {
   float vx;
@@ -98,13 +108,13 @@ void UpdateDrawFireworks(std::vector<Firework> &fws) {
         }
       }
 
-      fw.age += PARTICLE_SPEED * deltaTime;
+      fw.age += PARTICLE_SPEED * deltaTime * TIMESCALE;
 
       if (fw.age > 100 && RandFloat(0, 1) < 0.05f) {
         ResetFirework(fw);
       }
     } else {
-      fw.y -= 600.0f * deltaTime;
+      fw.y -= 600.0f * deltaTime * TIMESCALE;
 
       for (int s = 0; s < 15; s++) {
         Color c = {(unsigned char)(i * 50), (unsigned char)(s * 17), 0, 255};
