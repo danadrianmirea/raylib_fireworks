@@ -3,8 +3,8 @@
 #include <cstdlib>
 #include <ctime>
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 800;
+const int SCREEN_WIDTH = 1920;
+const int SCREEN_HEIGHT = 1080;
 
 const int MAX_FIREWORKS = 25;
 const int MAX_SPARKS = 150;
