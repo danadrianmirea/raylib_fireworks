@@ -5,17 +5,17 @@
 
 
 #ifndef EMSCRIPTEN_BUILD
+const int SCREEN_WIDTH = 1920;
+const int SCREEN_HEIGHT = 1080;
+const int MAX_FIREWORKS = 20;
+const int MAX_SPARKS = 500;
+const float TIMESCALE = 1.0f;
+#else
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 540;
 const int MAX_FIREWORKS = 10;
 const int MAX_SPARKS = 500;
 const float TIMESCALE = 1.0f;
-#else
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-const int MAX_FIREWORKS = 20;
-const int MAX_SPARKS = 500;
-const float TIMESCALE = 0.66f;
 #endif
 
 const float FPS = 144.0f;
