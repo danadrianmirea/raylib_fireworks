@@ -21,7 +21,7 @@ struct Spark {
 struct Firework {
     float x;
     float y;
-    int age;
+    float age;
     bool explode;
     std::vector<Spark> sparks;
 };
@@ -39,7 +39,7 @@ void ResetFirework(Firework &fw) {
 
 int main() {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib Fireworks");
-    SetTargetFPS(60);
+    SetTargetFPS(144);
 
     srand((unsigned)time(nullptr));
 
@@ -69,6 +69,8 @@ int main() {
     }
 
     while (!WindowShouldClose()) {
+        float deltaTime = GetFrameTime();
+
         BeginDrawing();
         ClearBackground(BLACK);
 
@@ -78,13 +80,13 @@ int main() {
             if (fw.explode) {
                 for (auto &s : fw.sparks) {
                     for (int t = 0; t < 10; t++) {
-                        int trailAge = fw.age + t;
+                        float trailAge = fw.age + (float)t;
 
                         float x = fw.x + s.vx * trailAge;
                         float y = fw.y + s.vy * trailAge
                                   + s.weight * trailAge * s.weight * trailAge;
 
-                        int fade = t * 20 - fw.age * 2;
+                        int fade = t * 20 - (int)(fw.age * 2);
                         if (fade < 0) fade = 0;
 
                         Color c = {
@@ -98,14 +100,14 @@ int main() {
                     }
                 }
 
-                fw.age++;
+                fw.age += 60.0f * deltaTime;
 
                 if (fw.age > 100 && RandFloat(0, 1) < 0.05f) {
                     ResetFirework(fw);
                 }
             }
             else {
-                fw.y -= 10;
+                fw.y -= 600.0f * deltaTime;
 
                 for (int s = 0; s < 15; s++) {
                     Color c = {
