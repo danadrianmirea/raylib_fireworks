@@ -3,26 +3,19 @@
 #include <ctime>
 #include <vector>
 
-
-#ifndef EMSCRIPTEN_BUILD
 const int SCREEN_WIDTH = 960;
 const int SCREEN_HEIGHT = 540;
-const int MAX_FIREWORKS = 20;
+const int RENDER_TEX_WIDTH = 1920;
+const int RENDER_TEX_HEIGHT = 1080;
+const int MAX_FIREWORKS = 29;
 const int MAX_SPARKS = 500;
 const float TIMESCALE = 1.0f;
-#else
-const int SCREEN_WIDTH = 960;
-const int SCREEN_HEIGHT = 540;
-const int MAX_FIREWORKS = 10;
-const int MAX_SPARKS = 500;
-const float TIMESCALE = 1.0f;
-#endif
 
 const float FPS = 144.0f;
 const float PARTICLE_SPEED = 60.0f;
 
 const float CHANCE_OF_EXPLOSION = 0.05f;
-const int HEIGHT_THRESHOLD = 4 * SCREEN_HEIGHT / 10;
+const int HEIGHT_THRESHOLD = 4 * RENDER_TEX_HEIGHT / 10;
 
 struct Spark {
   float vx;
@@ -48,8 +41,8 @@ float RandFloat(float min, float max) {
 }
 
 void ResetFirework(Firework &fw) {
-  fw.x = RandFloat(0, SCREEN_WIDTH);
-  fw.y = SCREEN_HEIGHT;
+  fw.x = RandFloat(0, RENDER_TEX_WIDTH);
+  fw.y = RENDER_TEX_HEIGHT;
   fw.age = 0;
   fw.explode = false;
 }
@@ -133,18 +126,57 @@ void UpdateDrawFireworks(std::vector<Firework> &fws) {
 }
 
 int main() {
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE);
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raylib Fireworks");
   SetTargetFPS(FPS);
   srand((unsigned)time(nullptr));
+
+  RenderTexture2D target = LoadRenderTexture(RENDER_TEX_WIDTH, RENDER_TEX_HEIGHT);
+  SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+
   InitFireworks(fireworks);
 
   while (!WindowShouldClose()) {
-    BeginDrawing();
+    if (IsKeyPressed(KEY_F11)) {
+      int monitor = GetCurrentMonitor();
+      if (IsWindowFullscreen()) {
+        ToggleFullscreen();
+        SetWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+      } else {
+        SetWindowSize(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+        ToggleFullscreen();
+      }
+    }
+
+    // Render to the virtual framebuffer (fixed resolution)
+    BeginTextureMode(target);
     ClearBackground(BLACK);
     UpdateDrawFireworks(fireworks);
+    EndTextureMode();
+
+    // Stretch the virtual framebuffer to fill the actual window
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    float scaleX = (float)GetScreenWidth() / SCREEN_WIDTH;
+    float scaleY = (float)GetScreenHeight() / SCREEN_HEIGHT;
+    float scale = (scaleX < scaleY) ? scaleX : scaleY;
+
+    float destWidth = SCREEN_WIDTH * scale;
+    float destHeight = SCREEN_HEIGHT * scale;
+    float destX = (GetScreenWidth() - destWidth) * 0.5f;
+    float destY = (GetScreenHeight() - destHeight) * 0.5f;
+
+    Rectangle sourceRec = {0, 0, (float)target.texture.width, -(float)target.texture.height};
+    Rectangle destRec = {destX, destY, destWidth, destHeight};
+    Vector2 origin = {0, 0};
+
+    DrawTexturePro(target.texture, sourceRec, destRec, origin, 0.0f, WHITE);
+
     EndDrawing();
   }
 
+  UnloadRenderTexture(target);
   CloseWindow();
   return 0;
 }
